@@ -1,40 +1,17 @@
-FROM ubuntu:18.04 AS build
+FROM quay.io/biocontainers/bwa:0.7.17--hed695b0_7 AS build
 
-ARG VERSION=0.7.17
+ARG VERSION=0.7.17--hed695b0_7
 
-RUN apt-get update -y \
- && apt-get install -y \
-    wget \
-    make \
-    gcc \
-    zlib1g-dev \
-    bzip2
+LABEL container.base.image="quay.io/biocontainer/bwa:0.7.17"
+LABEL software.name="bwa"
+LABEL software.version=${VERSION}
+LABEL software.description="Utilities for the Sequence Alignment/Map (SAM/BAM/CRAM) formats"
+LABEL software.website="http://www.htslib.org"
+LABEL software.documentation="http://www.htslib.org/doc/samtools.html"
+LABEL software.license="MIT/Expat"
+LABEL tags="Genomics"
 
-
-WORKDIR /opt/src
-RUN wget https://github.com/lh3/bwa/releases/download/v${VERSION}/bwa-${VERSION}.tar.bz2 \
- && tar -xjvf bwa-*.tar.bz2 \
- && cd bwa-* \
- && make \
- && cp bwa /opt/src
-
-
-FROM ubuntu:18.04 AS final
-
-RUN apt-get update -y \
- && apt-get install -y \
-    wget \
-    make \
-    zlib1g \
-    bzip2 \
- && apt-get clean
-
-WORKDIR /opt/bin
-COPY --from=build /opt/src/bwa .
-
-ENV PATH=/opt/bin:$PATH
-
-WORKDIR /scratch
+FROM quay.io/biocontainers/bwa:0.7.17--hed695b0_7 AS final
 
 ENTRYPOINT ["bwa"]
 
