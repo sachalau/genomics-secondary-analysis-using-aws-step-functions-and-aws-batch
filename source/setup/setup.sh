@@ -100,15 +100,15 @@ echo ${ZONE_BUCKET}
 
 # Download reference genome and copy into bucket, to be indexed and run into kraken
 python download_references.py
-mkdir fastas/
+mkdir fastas/ taxdump/
 mv *.fa fastas/
 wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz
 wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
+tar xf taxdump.tar.gz --directory taxdump/
 
-
-aws s3 cp --recursive fastas/ s3://$ZONE_BUCKET/references/mycobacterium/fastas/
-aws s3 cp nucl_gb.accession2taxid.gz s3://$ZONE_BUCKET/references/mycobacterium/taxonomy/
-aws s3 cp taxdump.tar.gz s3://$ZONE_BUCKET/references/mycobacterium/taxonomy/
+aws s3 cp --quiet --recursive fastas/ s3://$ZONE_BUCKET/references/mycobacterium/library/added/
+aws s3 cp --quiet nucl_gb.accession2taxid.gz s3://$ZONE_BUCKET/references/mycobacterium/taxonomy/
+aws s3 cp --quiet --recursive taxdump/ s3://$ZONE_BUCKET/references/mycobacterium/taxonomy/
 
 
 
