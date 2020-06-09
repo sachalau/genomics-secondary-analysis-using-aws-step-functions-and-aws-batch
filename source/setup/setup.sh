@@ -106,7 +106,7 @@ wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accessio
 wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
 
 
-aws s3 cp fastas/ s3://$ZONE_BUCKET/references/mycobacterium/fastas/
+aws s3 cp --recursive fastas/ s3://$ZONE_BUCKET/references/mycobacterium/fastas/
 aws s3 cp nucl_gb.accession2taxid.gz s3://$ZONE_BUCKET/references/mycobacterium/taxonomy/
 aws s3 cp taxdump.tar.gz s3://$ZONE_BUCKET/references/mycobacterium/taxonomy/
 
