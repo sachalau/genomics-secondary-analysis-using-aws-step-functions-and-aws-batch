@@ -1,6 +1,6 @@
-FROM quay.io/biocontainers/bwa:0.7.17--hed695b0_7 AS build
+FROM quay.io/biocontainers/bwa:0.7.17--hed695b0_7
 
-ARG VERSION=0.7.17--hed695b0_7
+ARG VERSION=0.7.17
 
 LABEL container.base.image="quay.io/biocontainer/bwa:0.7.17"
 LABEL software.name="bwa"
@@ -10,8 +10,6 @@ LABEL software.website="http://www.htslib.org"
 LABEL software.documentation="http://www.htslib.org/doc/samtools.html"
 LABEL software.license="MIT/Expat"
 LABEL tags="Genomics"
-
-FROM quay.io/biocontainers/bwa:0.7.17--hed695b0_7 AS final
 
 ENTRYPOINT ["bwa"]
 
