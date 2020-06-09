@@ -17,10 +17,10 @@ Parameters:
     Type: String
   BatchJobDefinitionBcftools:
     Type: String
-  
+  BatchJobDefinitionKraken:
+    Type: String  
   BatchJobQueue:
-    Type: String
-  
+    Type: String  
   StatesExecutionRoleArn:
     Type: String
 
