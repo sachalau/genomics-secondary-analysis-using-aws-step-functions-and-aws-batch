@@ -144,6 +144,23 @@ Resources:
           - ContainerPath: /opt/miniconda
             SourceVolume: awscli
   
+  BatchJobDefinitionKraken:
+    Type: "AWS::Batch::JobDefinition"
+    Properties:
+      JobDefinitionName: !Sub ${ProjectLowerCase}-kraken
+      Type: container #required
+      ContainerProperties:
+        Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ProjectLowerCase}-kraken
+        Vcpus: 8
+        Memory: 16000
+        Volumes:
+          - Host:
+              SourcePath: /opt/miniconda
+            Name: awscli
+        MountPoints:
+          - ContainerPath: /opt/miniconda
+            SourceVolume: awscli
+  
   BatchJobDefinitionSamtools:
     Type: "AWS::Batch::JobDefinition"
     Properties:
@@ -190,6 +207,7 @@ Resources:
         BatchJobDefinitionBwa: !Ref BatchJobDefinitionBwa
         BatchJobDefinitionSamtools: !Ref BatchJobDefinitionSamtools
         BatchJobDefinitionBcftools: !Ref BatchJobDefinitionBcftools
+        BatchJobDefinitionKraken: !Ref BatchJobDefinitionKraken
         BatchJobQueue: !GetAtt Batch.Outputs.LowPriorityQueue
         StatesExecutionRoleArn: !GetAtt IamRoles.Outputs.StatesExecutionRoleArn
       TemplateURL:

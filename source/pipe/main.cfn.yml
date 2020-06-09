@@ -115,6 +115,27 @@ Resources:
                     Fn::ImportValue:
                       !Sub ${ZoneStackName}-ZoneBucket
   
+  StackBuildContainerKraken:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      Parameters:
+        Project: !Ref ProjectLowerCase
+        ImageName: kraken
+        ImageTag: "1.1.1--pl526hc9558a2_4"
+        BuildSpec: ./containers/buildspec.yml
+        ProjectPath: ./containers/kraken
+        CodeBuildRoleArn: !GetAtt IamRoles.Outputs.CodeBuildRoleArn
+        UseProjectPrefix: "yes"
+      TemplateURL:
+        Fn::Sub:
+          - ${TemplateRootUrl}/container-buildproject.cfn.yaml
+          - TemplateRootUrl:
+              Fn::Sub:
+                - "https://${ZoneBucket}.s3.${AWS::Region}.amazonaws.com/zone"
+                - ZoneBucket:
+                    Fn::ImportValue:
+                      !Sub ${ZoneStackName}-ZoneBucket
+  
   StackBuildContainerSamtools:
     Type: "AWS::CloudFormation::Stack"
     Properties:
@@ -204,6 +225,16 @@ Resources:
                 Version: "1"
               Configuration:
                 ProjectName: !GetAtt "StackBuildContainerBwa.Outputs.Name"
+              InputArtifacts:
+              - Name: SourceStageOutput
+            - Name: kraken
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              Configuration:
+                ProjectName: !GetAtt "StackBuildContainerKraken.Outputs.Name"
               InputArtifacts:
               - Name: SourceStageOutput
             - Name: Samtools
