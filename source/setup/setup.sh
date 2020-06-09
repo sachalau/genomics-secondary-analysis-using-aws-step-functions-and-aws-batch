@@ -98,9 +98,16 @@ ZONE_BUCKET=$(aws cloudformation describe-stacks --stack-name $STACKNAME_ZONE --
 echo ${ZONE_BUCKET}
 
 
-# Copy sample data into the zone bucket
-aws s3 cp s3://$ARTIFACT_BUCKET/$ARTIFACT_KEY_PREFIX/samples/NIST7035_R1_trim_samp-0p1.fastq.gz s3://$ZONE_BUCKET/samples/NIST7035_R1_trim_samp-0p1.fastq.gz
-aws s3 cp s3://$ARTIFACT_BUCKET/$ARTIFACT_KEY_PREFIX/samples/NIST7035_R2_trim_samp-0p1.fastq.gz s3://$ZONE_BUCKET/samples/NIST7035_R2_trim_samp-0p1.fastq.gz
+# Download reference genome and copy into bucket, to be indexed and run into kraken
+python download_references.py
+wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz
+wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
+
+
+aws s3 cp ./*.fa s3://$ZONE_BUCKET/references/mycobacterium/
+aws s3 cp nucl_gb.accession2taxid.gz s3://$ZONE_BUCKET/references/mycobacterium/taxonomy/
+aws s3 cp taxdump.tar.gz s3://$ZONE_BUCKET/references/mycobacterium/taxonomy/
+
 
 
 git config --global credential.helper '!aws codecommit credential-helper $@'
