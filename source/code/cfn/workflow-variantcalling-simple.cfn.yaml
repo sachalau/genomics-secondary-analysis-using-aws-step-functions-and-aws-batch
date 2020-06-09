@@ -47,7 +47,8 @@ Resources:
                         "jobdefs": {
                             "bwa": "${BatchJobDefinitionBwa}",
                             "samtools": "${BatchJobDefinitionSamtools}",
-                            "bcftools": "${BatchJobDefinitionBcftools}"
+                            "bcftools": "${BatchJobDefinitionBcftools}",
+                            "kraken": "${BatchJobDefinitionKraken}"
                         }
                     },
                     "Next": "BwaMem"
