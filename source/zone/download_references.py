@@ -22,7 +22,7 @@ for entries in [selected_assemblies[i:i + n] for i in range(0, len(selected_asse
             z = zipfile.ZipFile(io.BytesIO(response))
             for name in z.namelist():
                 if name.endswith(".fna"):
-                    filename = name.split("/")[3].split("_genomic")[0] + ".fa"
+                    filename = name.split("/")[3].split("_genomic")[0] + ".fna"
                     open(filename, "wb").write(z.read(name))
         except zipfile.BadZipFile:
             raise zipfile.BadZipFile("Error in zip file for request " + ",".join(entries) + ", response was : " +  str(response))
