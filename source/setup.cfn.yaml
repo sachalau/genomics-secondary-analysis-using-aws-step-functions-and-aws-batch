@@ -336,6 +336,7 @@ Resources:
                 - Effect: Allow
                   Action:
                     - batch:DescribeComputeEnvironments
+                    - batch:SubmitJob
                   Resource: "*"
           - PolicyName: EC2AutoScalingAccess
             PolicyDocument:
