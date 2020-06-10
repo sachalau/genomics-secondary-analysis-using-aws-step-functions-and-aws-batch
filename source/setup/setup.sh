@@ -144,6 +144,7 @@ git add .
 git commit -m "first commit"
 git remote add origin $(get-repo-url $STACKNAME_PIPE)
 git push -u origin master
+    
 
 wait-for-stack $STACKNAME_CODE
 status=$?
@@ -154,6 +155,21 @@ if [ ! "$status" -eq 0 ]; then
 fi
 
 set +e
+
+RESULTS_BUCKET=$(aws cloudformation describe-stacks --stack-name $STACKNAME_CODE --query 'Stacks[].Outputs[?OutputKey==`JobResultsBucket`].OutputValue' --output text)
+
+echo $RESULTS_BUCKET
+
+aws batch \
+  submit-job \
+    --job-name BuildKrakenDatabase \
+    --job-queue ${PROJECT_NAME}LowPriority \
+    --job-definition ${PROJECT_NAME_LOWER_CASE}-kraken \
+    --container-overrides 'memory=24000,command=[gzip,-d,mycobacterium/taxonomy/nucl_gb.accession2taxid.gz,&&,kraken-build,--build,-db,mycobacterium],environment=[{name=JOB_INPUTS,value=s3://'"$ZONE_BUCKET"'/references/*},{name=JOB_OUTPUT_PREFIX,value=s3://'"$RESULTS_BUCKET"'/references/mycobacterium/},{name=JOB_OUTPUTS,value=mycobacterium/database.idx mycobacterium/database.kdb}]'
+        
+
+
+
 
 # SMOKE TEST HERE
 if [[ $SMOKE_TEST && $SMOKE_TEST == 1 ]]; then
