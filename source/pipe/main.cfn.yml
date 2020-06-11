@@ -12,7 +12,6 @@ Parameters:
   ProjectLowerCase:
     Type: String
     Default: genomicsworkflow
-  
   ZoneStackName:
     Type: String
     Default: GenomicsWorkflowZone
@@ -103,6 +102,27 @@ Resources:
         ImageTag: "0.7.17"
         BuildSpec: ./containers/buildspec.yml
         ProjectPath: ./containers/bwa
+        CodeBuildRoleArn: !GetAtt IamRoles.Outputs.CodeBuildRoleArn
+        UseProjectPrefix: "yes"
+      TemplateURL:
+        Fn::Sub:
+          - ${TemplateRootUrl}/container-buildproject.cfn.yaml
+          - TemplateRootUrl:
+              Fn::Sub:
+                - "https://${ZoneBucket}.s3.${AWS::Region}.amazonaws.com/zone"
+                - ZoneBucket:
+                    Fn::ImportValue:
+                      !Sub ${ZoneStackName}-ZoneBucket
+                      
+  StackBuildContainerFreebayes:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      Parameters:
+        Project: !Ref ProjectLowerCase
+        ImageName: freebayes
+        ImageTag: "1.3.2"
+        BuildSpec: ./containers/buildspec.yml
+        ProjectPath: ./containers/freebayes
         CodeBuildRoleArn: !GetAtt IamRoles.Outputs.CodeBuildRoleArn
         UseProjectPrefix: "yes"
       TemplateURL:

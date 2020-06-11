@@ -17,11 +17,15 @@ with urllib.request.urlopen("https://api.ncbi.nlm.nih.gov/datasets/v1alpha/assem
         
 for entries in [selected_assemblies[i:i + n] for i in range(0, len(selected_assemblies), n)]:
     with urllib.request.urlopen("https://api.ncbi.nlm.nih.gov/datasets/v1alpha/download/assembly_accession/" + "%2C".join(entries) + "?&include_sequence=true&resolve=FULLY_RESOLVED") as assembly_response:
-        z = zipfile.ZipFile(io.BytesIO(assembly_response.read()))
-        for name in z.namelist():
-            if name.endswith(".fna"):
-                filename = name.split("/")[3].split("_genomic")[0] + ".fna"
-                open(filename, "wb").write(z.read(name))
+        response = assembly_response.read()
+        try:
+            z = zipfile.ZipFile(io.BytesIO(response))
+            for name in z.namelist():
+                if name.endswith(".fna"):
+                    filename = name.split("/")[3].split("_genomic")[0] + ".fna"
+                    open(filename, "wb").write(z.read(name))
+        except zipfile.BadZipFile:
+            raise zipfile.BadZipFile("Error in zip file for request " + ",".join(entries) + ", response was : " +  str(response))
 
 
 

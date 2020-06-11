@@ -17,6 +17,8 @@ Parameters:
     Type: String
   BatchJobDefinitionBcftools:
     Type: String
+  BatchJobDefinitionFreebayes:
+    Type: String
   BatchJobDefinitionKraken:
     Type: String  
   BatchJobQueue:
@@ -63,12 +65,12 @@ Resources:
                         "JobDefinition.$": "$.jobdefs.bwa",
                         "JobQueue.$": "$.params.queue",
                         "ContainerOverrides": {
-                            "Vcpus": 8,
-                            "Memory": 8000,
+                            "Vcpus": 4,
+                            "Memory": 4000,
                             "Environment": [
                                 {"Name": "JOB_WORKFLOW_NAME", "Value.$": "$.workflow.name"},
                                 {"Name": "JOB_WORKFLOW_EXECUTION_ID", "Value.$": "$.workflow.execution"},
-                                {"Name": "JOB_INPUTS", "Value": "s3://broad-references/hg38/v0/Homo_sapiens_assembly38.fasta* ${!SOURCE_DATA_PREFIX}/${!SAMPLE_ID}*"},
+                                {"Name": "JOB_INPUTS", "Value": "${!SOURCE_DATA_PREFIX}/${!SAMPLE_ID}*"},
                                 {"Name": "JOB_OUTPUTS", "Value": "*.sam"},
                                 {"Name": "JOB_OUTPUT_PREFIX", "Value.$": "$.params.environment.JOB_OUTPUT_PREFIX"},
                                 {"Name": "JOB_AWS_CLI_PATH", "Value.$": "$.params.environment.JOB_AWS_CLI_PATH"},
@@ -77,7 +79,7 @@ Resources:
                                 {"Name": "REFERENCE_NAME", "Value.$": "$.params.environment.REFERENCE_NAME"}
                             ],
                             "Command": [
-                                "bwa mem -t 8 -p -o ${!SAMPLE_ID}.sam ${!REFERENCE_NAME}.fasta ${!SAMPLE_ID}_*1*.fastq.gz"
+                                "bwa mem -t 4 -p -o ${!SAMPLE_ID}.sam ${!REFERENCE_NAME}.fna ${!SAMPLE_ID}_*1*.fastq.gz"
                             ]
                         }
                     },

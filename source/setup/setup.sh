@@ -147,6 +147,7 @@ git add .
 git commit -m "first commit"
 git remote add origin $(get-repo-url $STACKNAME_PIPE)
 git push -u origin master
+    
 
 wait-for-stack $STACKNAME_CODE
 status=$?
@@ -158,7 +159,28 @@ fi
 
 set +e
 
+<<<<<<< HEAD
 aws batch submit-job --job-name KrakenBuildDataBase --job-queue GenomicsWorkflowLowPriority --job-definition genomicsworkflow-kraken --container-overrides 'memory=24000,command=["gzip","-d","mycobacterium/taxonomy/nucl_gb.accession2taxid.gz","&&","kraken-build","--build","-db","mycobacterium"],environment=[{name="JOB_INPUTS",value="s3://'"$ZONE_BUCKET"'/references/*"},{name="JOB_OUTPUT_PREFIX",value="s3://genomicsworkflowcode-jobresultsbucket-kfhacfnjiyiw/references/mycobacterium"},{name="JOB_OUTPUTS",value="mycobacterium/database.idx mycobacterium/database.kdb"}]'
+=======
+RESULTS_BUCKET=$(aws cloudformation describe-stacks --stack-name $STACKNAME_CODE --query 'Stacks[].Outputs[?OutputKey==`JobResultsBucket`].OutputValue' --output text)
+
+echo $RESULTS_BUCKET
+
+aws batch \
+  submit-job \
+    --job-name BuildKrakenDatabase \
+    --job-queue ${PROJECT_NAME}LowPriority \
+    --job-definition ${PROJECT_NAME_LOWER_CASE}-kraken \
+    --container-overrides 'memory=24000,command=[gzip,-d,mycobacterium/taxonomy/nucl_gb.accession2taxid.gz,&&,kraken-build,--build,-db,mycobacterium],environment=[{name=JOB_INPUTS,value=s3://'"$ZONE_BUCKET"'/references/*},{name=JOB_OUTPUT_PREFIX,value=s3://'"$RESULTS_BUCKET"'/references/mycobacterium/},{name=JOB_OUTPUTS,value=mycobacterium/database.idx mycobacterium/database.kdb}]'
+
+aws batch \
+  submit-job \
+  --job-name IndexReferenceBwa \
+  --job-queue ${PROJECT_NAME}LowPriority \
+  --job-definition ${PROJECT_NAME_LOWER_CASE}-bwa \
+  --container-overrides 'command=[bwa,index,GCF_000195955.2_ASM19595v2.fna],environment=[{name=JOB_INPUTS,value=s3://'"$ZONE_BUCKET"'/references/mycobacterium/library/added/GCF_000195955.2_ASM19595v2.fna},{name=JOB_OUTPUT_PREFIX,value=s3://'"$RESULTS_BUCKET"'/references/mycobacterium/library/added},{name=JOB_OUTPUTS,value=GCF_000195955.2_ASM19595v2.fna.bwt}]'
+
+>>>>>>> ed6b4c76cd6b87b95a33b2093f6bee35263ec4a9
 
 
 # SMOKE TEST HERE
