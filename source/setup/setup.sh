@@ -159,12 +159,8 @@ fi
 
 set +e
 
-<<<<<<< HEAD
-aws batch submit-job --job-name KrakenBuildDataBase --job-queue GenomicsWorkflowLowPriority --job-definition genomicsworkflow-kraken --container-overrides 'memory=24000,command=["gzip","-d","mycobacterium/taxonomy/nucl_gb.accession2taxid.gz","&&","kraken-build","--build","-db","mycobacterium"],environment=[{name="JOB_INPUTS",value="s3://'"$ZONE_BUCKET"'/references/*"},{name="JOB_OUTPUT_PREFIX",value="s3://genomicsworkflowcode-jobresultsbucket-kfhacfnjiyiw/references/mycobacterium"},{name="JOB_OUTPUTS",value="mycobacterium/database.idx mycobacterium/database.kdb"}]'
-=======
-RESULTS_BUCKET=$(aws cloudformation describe-stacks --stack-name $STACKNAME_CODE --query 'Stacks[].Outputs[?OutputKey==`JobResultsBucket`].OutputValue' --output text)
 
-echo $RESULTS_BUCKET
+RESULTS_BUCKET=$(aws cloudformation describe-stacks --stack-name $STACKNAME_CODE --query 'Stacks[].Outputs[?OutputKey==`JobResultsBucket`].OutputValue' --output text)
 
 aws batch \
   submit-job \
@@ -180,7 +176,6 @@ aws batch \
   --job-definition ${PROJECT_NAME_LOWER_CASE}-bwa \
   --container-overrides 'command=[bwa,index,GCF_000195955.2_ASM19595v2.fna],environment=[{name=JOB_INPUTS,value=s3://'"$ZONE_BUCKET"'/references/mycobacterium/library/added/GCF_000195955.2_ASM19595v2.fna},{name=JOB_OUTPUT_PREFIX,value=s3://'"$RESULTS_BUCKET"'/references/mycobacterium/library/added},{name=JOB_OUTPUTS,value=GCF_000195955.2_ASM19595v2.fna.bwt}]'
 
->>>>>>> ed6b4c76cd6b87b95a33b2093f6bee35263ec4a9
 
 
 # SMOKE TEST HERE
