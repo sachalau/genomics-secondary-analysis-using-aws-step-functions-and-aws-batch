@@ -101,10 +101,13 @@ echo ${ZONE_BUCKET}
 # Download reference genome and copy into bucket, to be indexed and run into kraken
 python download_references.py
 mkdir fastas/ taxdump/
-mv *.fa fastas/
+mv *.fna fastas/
+grep ">" fastas/*.fna  -h | tr -d ">" | sed "s/ .*//" | sed "s/\(.*\)/\1\t\1/" | sed "s/\.[0-9]\+$//" | sed "s/^/ACCNUM\t/" > fastas/prelim_map.txt
+
 wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz
 wget -q ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
 tar xf taxdump.tar.gz --directory taxdump/
+
 
 aws s3 cp --quiet --recursive fastas/ s3://$ZONE_BUCKET/references/mycobacterium/library/added/
 aws s3 cp --quiet nucl_gb.accession2taxid.gz s3://$ZONE_BUCKET/references/mycobacterium/taxonomy/
@@ -154,6 +157,9 @@ if [ ! "$status" -eq 0 ]; then
 fi
 
 set +e
+
+aws batch submit-job --job-name KrakenBuildDataBase --job-queue GenomicsWorkflowLowPriority --job-definition genomicsworkflow-kraken --container-overrides 'memory=24000,command=["gzip","-d","mycobacterium/taxonomy/nucl_gb.accession2taxid.gz","&&","kraken-build","--build","-db","mycobacterium"],environment=[{name="JOB_INPUTS",value="s3://'"$ZONE_BUCKET"'/references/*"},{name="JOB_OUTPUT_PREFIX",value="s3://genomicsworkflowcode-jobresultsbucket-kfhacfnjiyiw/references/mycobacterium"},{name="JOB_OUTPUTS",value="mycobacterium/database.idx mycobacterium/database.kdb"}]'
+
 
 # SMOKE TEST HERE
 if [[ $SMOKE_TEST && $SMOKE_TEST == 1 ]]; then
