@@ -167,14 +167,14 @@ aws batch \
     --job-name BuildKrakenDatabase \
     --job-queue ${PROJECT_NAME}LowPriority \
     --job-definition ${PROJECT_NAME_LOWER_CASE}-kraken \
-    --container-overrides 'memory=24000,command=[gzip,-d,mycobacterium/taxonomy/nucl_gb.accession2taxid.gz,&&,kraken-build,--build,-db,mycobacterium],environment=[{name=JOB_INPUTS,value=s3://'"$ZONE_BUCKET"'/references/*},{name=JOB_OUTPUT_PREFIX,value=s3://'"$RESULTS_BUCKET"'/references/mycobacterium/},{name=JOB_OUTPUTS,value=mycobacterium/database.idx mycobacterium/database.kdb}]'
+    --container-overrides 'memory=24000,command=[gzip,-d,mycobacterium/taxonomy/nucl_gb.accession2taxid.gz],environment=[{name=JOB_INPUTS,value=s3://'"$ZONE_BUCKET"'/references/*},{name=JOB_OUTPUT_PREFIX,value=s3://'"$RESULTS_BUCKET"'/references/mycobacterium},{name=JOB_OUTPUTS,value=mycobacterium/database.idx mycobacterium/database.kdb}]'
 
 aws batch \
   submit-job \
   --job-name IndexReferenceBwa \
   --job-queue ${PROJECT_NAME}LowPriority \
   --job-definition ${PROJECT_NAME_LOWER_CASE}-bwa \
-  --container-overrides 'command=[bwa,index,GCF_000195955.2_ASM19595v2.fna],environment=[{name=JOB_INPUTS,value=s3://'"$ZONE_BUCKET"'/references/mycobacterium/library/added/GCF_000195955.2_ASM19595v2.fna},{name=JOB_OUTPUT_PREFIX,value=s3://'"$RESULTS_BUCKET"'/references/mycobacterium/library/added},{name=JOB_OUTPUTS,value=GCF_000195955.2_ASM19595v2.fna.bwt}]'
+  --container-overrides 'command=[bwa,index,GCF_000195955.2_ASM19595v2.fna],environment=[{name=JOB_INPUTS,value=s3://'"$ZONE_BUCKET"'/references/mycobacterium/library/added/GCF_000195955.2_ASM19595v2.fna},{name=JOB_OUTPUT_PREFIX,value=s3://'"$RESULTS_BUCKET"'/references/mycobacterium/library/added},{name=JOB_OUTPUTS,value=GCF_000195955.2_ASM19595v2.fna*}]'
 
 
 
